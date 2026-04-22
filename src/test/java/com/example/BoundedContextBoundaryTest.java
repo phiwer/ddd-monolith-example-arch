@@ -69,19 +69,35 @@ class BoundedContextBoundaryTest {
     @Test
     @DisplayName("Cross-context dependencies only go through application interfaces")
     void crossContextDependenciesUseApplicationLayer() {
-        // Ordering can depend on Catalog's application layer (interface + DTOs)
-        // but never on Catalog's domain or infrastructure
+        // Ordering can depend on Catalog's and Payment's application layer
+        // (interface + DTOs) but never on their domain or infrastructure
         ArchRule rule = classes()
                 .that().resideInAnyPackage("com.example.ordering..")
                 .should().onlyAccessClassesThat()
                 .resideInAnyPackage(
                         "com.example.ordering..",
                         "com.example.catalog.application..",   // ← allowed: interface + DTOs
+                        "com.example.payment.application..",   // ← allowed: interface + DTOs
                         "com.example.shared..",                 // ← allowed: shared kernel
                         "java..",
                         "org.springframework..",
                         "jakarta.."
                 );
+
+        rule.check(allClasses);
+    }
+
+    @Test
+    @DisplayName("Payment may only be reached from Ordering's own adapter package (consumer-owned port pattern)")
+    void paymentIsOnlyAccessedViaOrderingAdapter() {
+        // The consumer-owned port pattern: ordering.domain.payment.PaymentGateway
+        // is Ordering's contract, ordering.infrastructure.payment is where the
+        // translation to com.example.payment.* lives. Nothing else in Ordering
+        // is allowed to know payment.* exists.
+        ArchRule rule = noClasses()
+                .that().resideInAPackage("com.example.ordering..")
+                .and().resideOutsideOfPackage("com.example.ordering.infrastructure.payment..")
+                .should().accessClassesThat().resideInAnyPackage("com.example.payment..");
 
         rule.check(allClasses);
     }

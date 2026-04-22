@@ -1,8 +1,11 @@
 package com.example.shared;
 
+import jakarta.persistence.Embeddable;
+
 import java.math.BigDecimal;
 import java.util.Currency;
 
+@Embeddable
 public record Money(BigDecimal amount, Currency currency) {
 
     public Money {

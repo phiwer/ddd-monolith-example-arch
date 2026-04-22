@@ -3,19 +3,31 @@ package com.example.catalog.domain.product;
 import com.example.shared.Money;
 import com.example.shared.ProductId;
 
+import jakarta.persistence.Embedded;
+import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+
 /**
  * Product in the Catalog context: rich with descriptions, categories, pricing.
  * This is the aggregate root for the Catalog bounded context.
  *
  * Note how different this is from what "Product" means in Ordering or Inventory.
  */
+@Entity
+@Table(name = "products")
 public class Product {
 
+    @EmbeddedId
     private ProductId id;
+
     private String name;
     private String description;
     private String category;
+
+    @Embedded
     private Money price;
+
     private boolean published;
 
     protected Product() {} // JPA

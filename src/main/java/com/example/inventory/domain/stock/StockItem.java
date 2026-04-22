@@ -2,14 +2,22 @@ package com.example.inventory.domain.stock;
 
 import com.example.shared.ProductId;
 
+import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+
 /**
  * In the Inventory context, we don't have "Products" — we have StockItems.
  * Same underlying thing, completely different model reflecting
  * what this context actually cares about.
  */
+@Entity
+@Table(name = "stock_items")
 public class StockItem {
 
+    @EmbeddedId
     private ProductId productId;
+
     private int quantityOnHand;
     private int reorderThreshold;
 
